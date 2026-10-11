@@ -40,8 +40,18 @@ fn create_archive(
 #[tauri::command]
 fn pick_archive_file() -> Option<String> {
     let file = rfd::FileDialog::new()
-        .add_filter("Archives (*.zip, *.tar.gz, *.tar.zst, *.7z, *.tar)", &["zip", "gz", "tgz", "zst", "tzst", "7z", "tar"])
-        .add_filter("All Files", &["*"])
+        .add_filter(
+            "All Supported Archives (*.rar, *.zip, *.7z, *.tar...)",
+            &[
+                "rar", "zip", "7z", "tar", "gz", "tgz", "zst", "tzst",
+                "RAR", "ZIP", "7Z", "TAR", "GZ", "TGZ", "ZST", "TZST",
+            ],
+        )
+        .add_filter("WinRAR Archives (*.rar)", &["rar", "RAR"])
+        .add_filter("ZIP Archives (*.zip)", &["zip", "ZIP"])
+        .add_filter("7-Zip Archives (*.7z)", &["7z", "7Z"])
+        .add_filter("Tar Archives (*.tar, *.tar.gz, *.tar.zst)", &["tar", "gz", "tgz", "zst", "tzst"])
+        .add_filter("All Files (*.*)", &["*"])
         .pick_file();
 
     file.map(|p| p.to_string_lossy().to_string())

@@ -98,4 +98,17 @@ mod tests {
         ).unwrap();
         assert_eq!(extracted_count, 1);
     }
+
+    #[test]
+    fn test_read_user_rar() {
+        let user_rar = r"C:\Users\Coraj\Downloads\Project Ultimate Reshade - ETS2_ATS.rar";
+        if std::path::Path::new(user_rar).exists() {
+            let entries = archive::list_archive(user_rar).expect("Failed to list user RAR archive");
+            println!("User RAR entries count: {}", entries.len());
+            assert!(!entries.is_empty(), "Archive should contain entries");
+            for e in entries.iter().take(5) {
+                println!(" - Entry: {} (Size: {} bytes, Dir: {})", e.name, e.size, e.is_dir);
+            }
+        }
+    }
 }

@@ -82,6 +82,8 @@ pub fn list_archive(archive_path: &str) -> Result<Vec<ArchiveEntry>, String> {
 
     if file_name.ends_with(".zip") {
         list_zip(archive_path)
+    } else if file_name.ends_with(".rar") {
+        list_rar(archive_path)
     } else if file_name.ends_with(".tar.gz") || file_name.ends_with(".tgz") {
         list_tar_gz(archive_path)
     } else if file_name.ends_with(".tar.zst") || file_name.ends_with(".tzst") {
@@ -281,6 +283,44 @@ fn list_7z(archive_path: &str) -> Result<Vec<ArchiveEntry>, String> {
             ratio,
             is_encrypted,
         });
+    }
+
+    Ok(entries)
+}
+
+fn list_rar(archive_path: &str) -> Result<Vec<ArchiveEntry>, String> {
+    let mut archive = unrar::Archive::new(archive_path)
+        .open_for_listing()
+        .map_err(|e| format!("Failed to open RAR archive: {:?}", e))?;
+
+    let mut entries = Vec::new();
+    while let Some(header) = archive.read_header().map_err(|e| format!("{:?}", e))? {
+        let entry = header.entry();
+        let raw_filename = entry.filename.as_path().to_string_lossy();
+        let entry_path = raw_filename.replace('\\', "/");
+        let name = Path::new(&entry_path)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(&entry_path)
+            .to_string();
+
+        let is_dir = entry.is_directory();
+        let size = entry.unpacked_size;
+        let compressed_size = size;
+        let is_encrypted = entry.is_encrypted();
+
+        entries.push(ArchiveEntry {
+            path: entry_path,
+            name,
+            is_dir,
+            size,
+            compressed_size,
+            modified: "RAR Archive".to_string(),
+            ratio: "-".to_string(),
+            is_encrypted,
+        });
+
+        archive = header.skip().map_err(|e| format!("{:?}", e))?;
     }
 
     Ok(entries)
@@ -494,6 +534,8 @@ pub fn extract_archive(
 
     if file_name.ends_with(".zip") {
         extract_zip(archive_path, dest_dir, selected_files)
+    } else if file_name.ends_with(".rar") {
+        extract_rar(archive_path, dest_dir, selected_files)
     } else if file_name.ends_with(".tar.gz") || file_name.ends_with(".tgz") {
         extract_tar_gz(archive_path, dest_dir, selected_files)
     } else if file_name.ends_with(".tar.zst") || file_name.ends_with(".tzst") {
@@ -678,6 +720,22 @@ fn extract_7z(archive_path: &str, dest_dir: &Path) -> Result<usize, String> {
     sevenz_rust::decompress_file(archive_path, dest_dir)
         .map_err(|e| format!("Failed to extract 7z archive: {}", e))?;
     Ok(1)
+}
+
+fn extract_rar(
+    archive_path: &str,
+    dest_dir: &Path,
+    _selected: Option<Vec<String>>,
+) -> Result<usize, String> {
+    let mut archive = unrar::Archive::new(archive_path)
+        .open_for_processing()
+        .map_err(|e| format!("Failed to open RAR archive: {:?}", e))?;
+    let mut count = 0;
+    while let Some(header) = archive.read_header().map_err(|e| format!("{:?}", e))? {
+        archive = header.extract_with_base(dest_dir).map_err(|e| format!("{:?}", e))?;
+        count += 1;
+    }
+    Ok(count)
 }
 
 pub fn create_archive(

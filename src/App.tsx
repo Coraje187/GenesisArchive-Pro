@@ -648,7 +648,7 @@ export default function App() {
             </p>
             <div style={{ display: "flex", gap: 12 }}>
               <button className="btn-tool primary" onClick={handleOpenArchive}>
-                <UploadCloud size={16} /> Open Archive (.zip, .7z, .tar.zst)
+                <UploadCloud size={16} /> Open Archive (.rar, .zip, .7z, .tar.zst)
               </button>
               <button className="btn-tool" onClick={() => setShowCreateModal(true)}>
                 <Plus size={16} /> Create New Archive
