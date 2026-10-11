@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {
   Folder,
@@ -164,24 +164,21 @@ export default function App() {
     setTabs((prev) => prev.map((t) => (t.id === activeTabId ? updater(t) : t)));
   };
 
-  const handleOpenArchive = async () => {
+  const openArchiveFromPath = async (archivePath: string) => {
     try {
-      const selectedPath = await invoke<string | null>("pick_archive_file");
-      if (!selectedPath) return;
-
       const entries = await invoke<ArchiveEntry[]>("list_archive", {
-        archivePath: selectedPath,
+        archivePath,
       });
 
       const report = await invoke<SecurityReport>("get_security_report", {
-        archivePath: selectedPath,
+        archivePath,
       });
 
-      const fileName = selectedPath.split(/[\\/]/).pop() || "Archive";
+      const fileName = archivePath.split(/[\\/]/).pop() || "Archive";
 
       updateActiveTab((tab) => ({
         ...tab,
-        archivePath: selectedPath,
+        archivePath,
         archiveName: fileName,
         entries,
         currentFolder: "",
@@ -194,6 +191,26 @@ export default function App() {
       alert(`Error loading archive: ${err}`);
     }
   };
+
+  const handleOpenArchive = async () => {
+    try {
+      const selectedPath = await invoke<string | null>("pick_archive_file");
+      if (!selectedPath) return;
+      await openArchiveFromPath(selectedPath);
+    } catch (err) {
+      alert(`Error opening archive: ${err}`);
+    }
+  };
+
+  useEffect(() => {
+    invoke<string | null>("get_initial_archive_path")
+      .then((path) => {
+        if (path) {
+          openArchiveFromPath(path);
+        }
+      })
+      .catch((err) => console.error("CLI startup check:", err));
+  }, []);
 
   const handleSelectEntry = async (entry: ArchiveEntry) => {
     updateActiveTab((t) => ({ ...t, selectedEntry: entry }));

@@ -107,6 +107,19 @@ fn run_benchmark(data_size_mb: Option<f64>) -> Vec<BenchmarkResult> {
     archive::benchmark_compression(data_size_mb.unwrap_or(20.0))
 }
 
+#[tauri::command]
+fn get_initial_archive_path() -> Option<String> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 {
+        let candidate = &args[1];
+        let p = std::path::Path::new(candidate);
+        if p.exists() && p.is_file() {
+            return Some(candidate.clone());
+        }
+    }
+    None
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -123,6 +136,7 @@ pub fn run() {
             pick_destination_folder,
             pick_save_archive,
             run_benchmark,
+            get_initial_archive_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
