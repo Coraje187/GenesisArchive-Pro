@@ -117,3 +117,9 @@ This generates:
 ## 📄 License
 
 Distributed under the **MIT License**. See `LICENSE` for details.
+
+---
+
+## ⚖️ Trademarks & Disclaimer
+
+WinRAR® is a registered trademark of win.rar GmbH. All other product names, trademarks, and registered trademarks mentioned are property of their respective owners. GenesisArchive is an independent open-source project and is not affiliated with, sponsored by, or endorsed by win.rar GmbH. Any references to third-party software are purely descriptive for comparison and compatibility under nominative fair use.
