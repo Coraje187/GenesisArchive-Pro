@@ -61,8 +61,8 @@ Algorithm: Standard Deflate / WinRAR style (Gzip - Level 6)
   * Blocks **Directory Traversal** attacks (`../` and illegal drive root paths).
   * Alerts you if hidden scripts or binaries (`.exe`, `.scr`, `.bat`, `.cmd`, `.vbs`, `.ps1`) are concealed inside.
 * 🗜️ **Universal Format Support:**
-  * **Extracts:** `.zip`, `.tar`, `.tar.gz`, `.tar.zst`, `.7z`.
-  * **Creates:** `.tar.zst` (Ultra-Fast), `.zip` (Universal), `.7z` (High-ratio LZMA), `.tar.gz` (POSIX standard).
+  * **Extracts:** `.rar` (Full RAR4 & RAR5 support), `.zip`, `.7z`, `.tar`, `.tar.gz`, `.tar.zst`.
+  * **Creates:** `.tar.zst` (Ultra-Fast Zstandard), `.zip` (Universal), `.7z` (High-ratio LZMA), `.tar.gz` (POSIX standard).
 * 🌓 **Fluent Dark / Light Themes:** Sleek Windows 11 Fluent and Linux GTK aesthetic.
 
 ---
@@ -71,14 +71,14 @@ Algorithm: Standard Deflate / WinRAR style (Gzip - Level 6)
 
 GenesisArchive was designed 100% clean-room from scratch in Rust and TypeScript:
 * **Zero proprietary RAR code:** We do not use or reverse-engineer Eugene Roshal's proprietary RAR compression algorithms.
-* **Open Standards:** Compression relies exclusively on open standards (Meta Zstandard, PKWARE ZIP, 7-Zip LZMA, POSIX TAR).
+* **Open Standards:** Compression relies exclusively on open standards (Meta Zstandard, PKWARE ZIP, 7-Zip LZMA, POSIX TAR) while providing full decompression for RAR4/RAR5 archives via open decompression libraries.
 * **Immune to Copyright Claims:** Free for personal, commercial, and enterprise deployment under the MIT License.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend / Core Engine:** [Rust](https://www.rust-lang.org/) (`zstd`, `zip`, `sevenz-rust`, `flate2`, `tar`, `rfd`, `rayon`)
+* **Backend / Core Engine:** [Rust](https://www.rust-lang.org/) (`zstd`, `unrar`, `zip`, `sevenz-rust`, `flate2`, `tar`, `rfd`, `rayon`)
 * **Desktop Wrapper:** [Tauri v2](https://tauri.app/) (Native OS WebViews: WebView2 on Windows, WebKitGTK on Linux)
 * **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Lucide Icons](https://lucide.dev/)
 
